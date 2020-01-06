@@ -123,7 +123,6 @@ int main(int argc, char** argv)
     ofstream myfile;
     myfile.open ("output.txt");
     if(myfile.is_open()) { 
-		myfile << "This is a line.\n";
 		myfile <<  "Duration of algoritm: " << duration << endl;
 		myfile.close();
 	}
