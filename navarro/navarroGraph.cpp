@@ -23,33 +23,33 @@ int findMin(double array[], int length);
 int Navarro(FastQ A, graph B);
 
 int similarityScore(char a, char b, int position){
-    if(a == b)
-    {
-        return match + previous_row[position-1];
-    }
-    else
-    {
-    	int option1 = previous_row[position-1] + mismatch;
-    	int option2 = previous_row[position] + indel;
-    	int option3 = previous_row[position-1] + indel;
-        return min(option1, option2, option3);
-    }
+	if(a == b)
+	{
+		return match + previous_row[position-1];
+	}
+	else
+	{
+		int option1 = previous_row[position-1] + mismatch;
+		int option2 = previous_row[position] + indel;
+		int option3 = previous_row[position-1] + indel;
+		return min(option1, option2, option3);
+	}
 }
 
 int findMin(int array[]){
 	int length = (sizeof(array)/sizeof(*array));
-    int min = array[0];
-    int position = 0;
+	int min = array[0];
+	int position = 0;
 
-    for(int i=1; i<length; i++)
-    {
-        if(array[i] < min)
-        {
-            min = array[i];
-            position = i;
-        }
-    }
-    return min;
+	for(int i=1; i<length; i++)
+	{
+		if(array[i] < min)
+		{
+			min = array[i];
+			position = i;
+		}
+	}
+	return min;
 }
 
 int Navarro(FastQ A, graph B){
@@ -86,15 +86,20 @@ int main(int argc, char** argv){
 	//1. FastQ result: seuquence, seq_id, quality
 	//2. GraGraph result: nodes, edgeOverlap, edges
 
-	cout << "Filename of sequences: " << endl;
-    cin >> fileSeq;
-    cout << "Filename of graph: " << endl;
-    cin >> fileGraph;
+	//argv = name of the program + arguments
+	// program, filename for sequences, filename for graph, scores
+
+	string fileSeq = argv[1]
+	string fileGraph = argv[2]
+
+	match = argv[3]
+	mismatch = argv[4]
+	indel = argv[5]
 
 	std::vector<FastQ> sequences = loadFastqFromFile(fileSeq);
-    Gragraph graph = GfaGraph::LoadFromFile(fileGraph);
+	Gragraph graph = GfaGraph::LoadFromFile(fileGraph);
 
-    int lengthGraph = graph.nodes.size();
+	int lengthGraph = graph.nodes.size();
 
 	auto start = high_resolution_clock::now();
 
@@ -104,29 +109,29 @@ int main(int argc, char** argv){
 		int result = Navarro(sequence, graph);
 
 		for(int i=0; i<lengthGraph; i++){
-	        cout << previous_row[i] << " ";
-	        cout << endl;
-	    }
+			cout << previous_row[i] << " ";
+			cout << endl;
+		}
 
-	    for(int i=0; i<lengthGraph; i++){
-	        cout << next_row[i] << " ";
-	        cout << endl;
-	    }
-	    
-	    cout << "Min score is: " << result << endl;
+		for(int i=0; i<lengthGraph; i++){
+			cout << next_row[i] << " ";
+			cout << endl;
+		}
+		
+		cout << "Min score is: " << result << endl;
 	}
 
-    auto stop = high_resolution_clock::now();
-    auto duration = duration_cast<microseconds>(stop - start); 
-    cout << duration.count() << endl; 
+	auto stop = high_resolution_clock::now();
+	auto duration = duration_cast<microseconds>(stop - start); 
+	cout << duration.count() << endl; 
 
-    ofstream myfile;
-    myfile.open ("output.txt");
-    if(myfile.is_open()) { 
+	ofstream myfile;
+	myfile.open ("output.txt");
+	if(myfile.is_open()) { 
 		myfile <<  "Duration of algoritm: " << duration << endl;
 		myfile.close();
 	}
-    else cout << "Unable to open the file.";
+	else cout << "Unable to open the file.";
 
-    return 0;
+	return 0;
 }
