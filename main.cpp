@@ -11,22 +11,21 @@ int main() {
     std::cout << inputDir << std::endl;
     graph = std::unique_ptr<GfaGraph>(GfaGraph::loadFromFile(
 //            inputDir + "ref10000_onechar.gfa"
-//            inputDir + "ref10000_tangle.gfa"
+            inputDir + "ref10000_tangle.gfa"
 //            inputDir + "ref10000_snp.gfa"
 //            inputDir + "ref10000_twopath.gfa"
-            inputDir + "example.gfa"
+//            inputDir + "example.gfa"
     ));
-    std::cout << 1 << std::endl;
     int n = graph->vertices.size();
-//    for (int i = 1; i <= n; ++i) {
-//        Node *node = graph->vertices[i].get();
-//        std::cout << node->id << "(" << node->sequence << "): ";
-//        for (auto &it : node->outEdges) {
-//            Node *child = it->to.get();
-//            std::cout << child->id << "(" << child->sequence << "), ";
-//        }
-//        std::cout << std::endl;
-//    }
+    for (int i = 1; i <= n; ++i) {
+        Node node = graph->vertices[i];
+        std::cout << node.id << "(" << node.sequence << "): ";
+        for (auto &it : node.outEdges) {
+            Node child = graph->vertices[it.to];
+            std::cout << child.id << "(" << child.sequence << "), ";
+        }
+        std::cout << std::endl;
+    }
     std::unordered_set<NodePosition> front;
     for (auto &it: graph->vertices) {
         Node node = it.second;
@@ -41,28 +40,20 @@ int main() {
         addedNew = false;
         std::unordered_set<NodePosition> frontNew;
         for (auto np : front) {
-            for (auto &newNP : np.next()) {
-                bool test = false;
-                for (const auto& p : allPos) {
-                    test = p == newNP;
-                    if (test) {
-                        break;
-                    }
-                }
-                if(!test){
+            for (auto &newNP : np.next(graph.get())) {
+                bool isIn = allPos.find(newNP) != allPos.end();
+                if(!isIn){
                     addedNew = true;
                     frontNew.insert(newNP);
                 }
-
             }
         }
-        for (auto &nodePos: frontNew) {
-            std::cout << nodePos << std::endl;
-        }
-        std::cout << std::endl;
         front.clear();
         front.insert(frontNew.begin(), frontNew.end());
+        allPos.insert(front.begin(), front.end());
     } while (addedNew);
+    //allPos su svi node-ovi onda se na njima radi previous i sto vec treba
+    //preporucam za onaj Cv radit novu unordered_map<NodePosition, int> pa imat Cv i Cv' mape za racunanje 'retka' i novog 'retka'
     for (auto &nodePos: allPos) {
         std::cout << nodePos << std::endl;
     }

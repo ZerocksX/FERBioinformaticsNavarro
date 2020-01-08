@@ -4,6 +4,7 @@
 
 #include "Node.h"
 
+
 bool Edge::operator==(const Edge &rhs) const {
     return from == rhs.from &&
            to == rhs.to &&
@@ -15,15 +16,12 @@ bool Edge::operator!=(const Edge &rhs) const {
     return !(rhs == *this);
 }
 
-Edge::Edge(Node &from, Node &to, char fromOrientation, char toOrientation, int overlap) : from(from),
-                                                                                                      to(to),
-                                                                                                      fromOrientation(
-                                                                                                              fromOrientation),
-                                                                                                      toOrientation(
-                                                                                                              toOrientation),
-                                                                                                      overlap(overlap) {}
-
 Edge::Edge() {}
+
+Edge::Edge(int from, int to, char fromOrientation, char toOrientation, int overlap) : from(from), to(to),
+                                                                                      fromOrientation(fromOrientation),
+                                                                                      toOrientation(toOrientation),
+                                                                                      overlap(overlap) {}
 
 
 bool Node::operator==(const Node &rhs) const {

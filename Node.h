@@ -12,22 +12,42 @@
 #include <unordered_set>
 #include <ostream>
 
-class Edge;
 
-class EdgeHashFunction {
+class Edge {
 public:
+    int from;
+    int to;
+    char fromOrientation;
+    char toOrientation;
+    int overlap;
 
-    // Use sum of lengths of first and last names
-    // as hash function.
-    size_t operator()(const Edge &x) const;
+    Edge();
+
+    Edge(int from, int to, char fromOrientation, char toOrientation, int overlap);
+
+    bool operator==(const Edge &rhs) const;
+
+    bool operator!=(const Edge &rhs) const;
+
 };
+
+
+namespace std {
+    template<>
+    struct hash<Edge> {
+        size_t operator()(const Edge &x) const {
+            return hash<int>()(x.from) ^ hash<int>()(x.to) ^ hash<char>()(x.fromOrientation) ^
+                   hash<char>()(x.toOrientation);
+        }
+    };
+}
 
 class Node {
 public:
     int id;
     std::string sequence;
-    std::unordered_set<Edge, EdgeHashFunction> inEdges;
-    std::unordered_set<Edge, EdgeHashFunction> outEdges;
+    std::unordered_set<Edge> inEdges;
+    std::unordered_set<Edge> outEdges;
 
     Node() : id{}, sequence{} {};
 
@@ -52,23 +72,6 @@ public:
 };
 
 
-class Edge {
-public:
-    Node from;
-    Node to;
-    char fromOrientation;
-    char toOrientation;
-    int overlap;
-
-    Edge();
-
-    Edge(Node &from, Node &to, char fromOrientation, char toOrientation, int overlap);
-
-    bool operator==(const Edge &rhs) const;
-
-    bool operator!=(const Edge &rhs) const;
-
-};
 
 namespace std {
     template<>
@@ -77,20 +80,6 @@ namespace std {
             return hash<long>()(x.id);
         }
     };
-}
-
-namespace std {
-    template<>
-    struct hash<Edge> {
-        size_t operator()(const Edge &x) const {
-            return hash<Node>()(x.from) ^ hash<Node>()(x.to) ^ hash<char>()(x.fromOrientation) ^
-                   hash<char>()(x.toOrientation);
-        }
-    };
-}
-
-size_t EdgeHashFunction::operator()(const Edge &x) const {
-    return std::hash<Edge>()(x);
 }
 
 

@@ -66,7 +66,7 @@ GfaGraph *GfaGraph::loadFromFile(std::string fileName) {
         sstr >> overlap;
         Node fromNode = gfaGraph->vertices[from];
         Node toNode = gfaGraph->vertices[to];
-        Edge edge = Edge(fromNode, toNode, fromstart[0], toend[0],
+        Edge edge = Edge(fromNode.id, toNode.id, fromstart[0], toend[0],
                          overlap);
         fromNode.outEdges.insert(edge);
         toNode.inEdges.emplace(
@@ -85,7 +85,7 @@ GfaGraph *GfaGraph::loadFromFile(std::string fileName) {
 
 GfaGraph::GfaGraph() {}
 
-std::vector<NodePosition> NodePosition::next() {
+std::vector<NodePosition> NodePosition::next(GfaGraph *gfaGraph) {
     std::vector<NodePosition> result;
     std::string seq = this->node.sequence;
     int n = this->node.sequence.size();
@@ -95,14 +95,14 @@ std::vector<NodePosition> NodePosition::next() {
     }
     for (auto &it : this->node.outEdges) {
         if ((n - it.overlap) == pos) {
-            result.emplace_back(it.to, 0, it, false,
+            result.emplace_back(gfaGraph->vertices[it.to], 0, it, false,
                                 it.toOrientation);
         }
     }
     return result;
 }
 
-std::vector<NodePosition> NodePosition::previous() {
+std::vector<NodePosition> NodePosition::previous(GfaGraph *gfaGraph) {
     std::vector<NodePosition> result;
     std::string seq = this->node.sequence;
     int n = this->node.sequence.size();
@@ -112,7 +112,7 @@ std::vector<NodePosition> NodePosition::previous() {
     }
     for (auto &it : this->node.inEdges) {
         if ((n - it.overlap) == pos) {
-            result.emplace_back(this->node, 0, it, true,
+            result.emplace_back(gfaGraph->vertices[it.to], 0, it, true,
                                 it.toOrientation);
         }
     }

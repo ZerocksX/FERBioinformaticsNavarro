@@ -12,6 +12,17 @@
 #include "Node.h"
 
 
+
+class GfaGraph {
+public:
+    std::unordered_map<int, Node> vertices;
+
+    static GfaGraph *loadFromFile(std::string fileName);
+
+private:
+    GfaGraph();
+};
+
 class NodePosition {
 public:
     Node node;
@@ -20,9 +31,9 @@ public:
     bool reverse;
     char orientation;
 
-    std::vector<NodePosition> next();
+    std::vector<NodePosition> next(GfaGraph *gfaGraph);
 
-    std::vector<NodePosition> previous();
+    std::vector<NodePosition> previous(GfaGraph *gfaGraph);
 
     char getCurrentChar() const;
 
@@ -53,16 +64,6 @@ namespace std {
         }
     };
 }
-
-class GfaGraph {
-public:
-    std::unordered_map<int, Node> vertices;
-
-    static GfaGraph *loadFromFile(std::string fileName);
-
-private:
-    GfaGraph();
-};
 
 
 #endif //NAVARRO_GFAGRAPH_H
