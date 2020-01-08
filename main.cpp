@@ -11,10 +11,10 @@ int main() {
     std::cout << inputDir << std::endl;
     graph = std::unique_ptr<GfaGraph>(GfaGraph::loadFromFile(
 //            inputDir + "ref10000_onechar.gfa"
-            inputDir + "ref10000_tangle.gfa"
+//            inputDir + "ref10000_tangle.gfa"
 //            inputDir + "ref10000_snp.gfa"
 //            inputDir + "ref10000_twopath.gfa"
-//            inputDir + "example.gfa"
+            inputDir + "example.gfa"
     ));
     int n = graph->vertices.size();
 
@@ -33,8 +33,8 @@ int main() {
     std::unordered_set<NodePosition> front;
     for (auto &it: graph->vertices) {
         Node node = it.second;
-        for (auto &e: node.outEdges) {
-            front.insert(NodePosition(node, e, false));
+        for (auto &e: node.inEdges) {
+            front.insert(NodePosition(node, e, true));
         }
     }
     std::unordered_set<NodePosition> allPos;
@@ -44,7 +44,7 @@ int main() {
         addedNew = false;
         std::unordered_set<NodePosition> frontNew;
         for (auto np : front) {
-            for (auto &newNP : np.next(graph.get())) {
+            for (auto &newNP : np.previous(graph.get())) {
                 bool isIn = allPos.find(newNP) != allPos.end();
                 if(!isIn){
                     addedNew = true;
@@ -52,12 +52,17 @@ int main() {
                 }
             }
         }
+        std::cout << "size: " << frontNew.size() << std::endl;
+        for(auto p : frontNew){
+            std::cout << p << std::endl;
+        }
         front.clear();
         front.insert(frontNew.begin(), frontNew.end());
         allPos.insert(front.begin(), front.end());
     } while (addedNew);
     //allPos su svi node-ovi onda se na njima radi previous i sto vec treba
     //preporucam za onaj Cv radit novu unordered_map<NodePosition, int> pa imat Cv i Cv' mape za racunanje 'retka' i novog 'retka'
+    std::cout << "All node(char): " << std::endl;
     for (auto &nodePos: allPos) {
         std::cout << nodePos << std::endl;
     }
