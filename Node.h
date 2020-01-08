@@ -14,19 +14,25 @@
 
 class Edge;
 
+class EdgeHashFunction {
+public:
+
+    // Use sum of lengths of first and last names
+    // as hash function.
+    size_t operator()(const Edge &x) const;
+};
+
 class Node {
 public:
     int id;
     std::string sequence;
-    std::unordered_set<std::shared_ptr<Edge>> inEdges;
-    std::unordered_set<std::shared_ptr<Edge>> outEdges;
+    std::unordered_set<Edge, EdgeHashFunction> inEdges;
+    std::unordered_set<Edge, EdgeHashFunction> outEdges;
 
     Node() : id{}, sequence{} {};
 
 //    ~Node(){};
     Node(int pid, std::string &psequence) : id{pid}, sequence{psequence} {};
-
-    void addChild(Edge *edge);
 
     bool operator==(const Node &rhs) const;
 
@@ -42,22 +48,27 @@ public:
 
     friend std::ostream &operator<<(std::ostream &os, const Node &node);
 
+
 };
 
 
 class Edge {
 public:
-    std::shared_ptr<Node> from;
-    std::shared_ptr<Node> to;
+    Node from;
+    Node to;
     char fromOrientation;
     char toOrientation;
     int overlap;
 
-    Edge(std::shared_ptr<Node> from, std::shared_ptr<Node> to, char fromOrientation, char toOrientation,
-         int overlap);
+    Edge();
+
+    Edge(Node &from, Node &to, char fromOrientation, char toOrientation, int overlap);
+
+    bool operator==(const Edge &rhs) const;
+
+    bool operator!=(const Edge &rhs) const;
 
 };
-
 
 namespace std {
     template<>
@@ -65,23 +76,22 @@ namespace std {
         size_t operator()(const Node &x) const {
             return hash<long>()(x.id);
         }
-
-        size_t operator()(const std::shared_ptr<Node> &x) const {
-            return hash<long>()(x.get()->id);
-        }
     };
 }
-
 
 namespace std {
     template<>
     struct hash<Edge> {
-
-        size_t operator()(const std::shared_ptr<Edge> &x) const {
-            return hash<int>()(x->from->id) ^ hash<int>()(x->to->id) ^ hash<char>()(x->fromOrientation) ^
-                   hash<char>()(x->toOrientation);
+        size_t operator()(const Edge &x) const {
+            return hash<Node>()(x.from) ^ hash<Node>()(x.to) ^ hash<char>()(x.fromOrientation) ^
+                   hash<char>()(x.toOrientation);
         }
     };
 }
+
+size_t EdgeHashFunction::operator()(const Edge &x) const {
+    return std::hash<Edge>()(x);
+}
+
 
 #endif //NAVARRO_NODE_H

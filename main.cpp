@@ -1,6 +1,7 @@
 #include <iostream>
 #include <algorithm>
 #include <memory>
+#include <set>
 #include "GfaGraph.h"
 
 std::unique_ptr<GfaGraph> graph;
@@ -26,21 +27,44 @@ int main() {
 //        }
 //        std::cout << std::endl;
 //    }
-    std::vector<std::shared_ptr<NodePosition>> nextPos;
+    std::unordered_set<NodePosition> front;
     for (auto &it: graph->vertices) {
-        std::shared_ptr<Node> node = it.second;
-        for (auto &e: node->inEdges) {
-            std::shared_ptr<NodePosition> nextNode = std::make_shared<NodePosition>(node, e);
-            nextNode->reverse = true;
-            nextPos.push_back(nextNode);
+        Node node = it.second;
+        for (auto &e: node.outEdges) {
+            front.insert(NodePosition(node, e, false));
         }
     }
-    for (auto &nodePos: nextPos) {
-        std::cout << *nodePos << std::endl << std::endl;
-        for (auto &next: nodePos->next()) {
-            std::cout << *next << std::endl;
+    std::unordered_set<NodePosition> allPos;
+    allPos.insert(front.begin(), front.end());
+    bool addedNew;
+    do {
+        addedNew = false;
+        std::unordered_set<NodePosition> frontNew;
+        for (auto np : front) {
+            for (auto &newNP : np.next()) {
+                bool test = false;
+                for (const auto& p : allPos) {
+                    test = p == newNP;
+                    if (test) {
+                        break;
+                    }
+                }
+                if(!test){
+                    addedNew = true;
+                    frontNew.insert(newNP);
+                }
+
+            }
+        }
+        for (auto &nodePos: frontNew) {
+            std::cout << nodePos << std::endl;
         }
         std::cout << std::endl;
+        front.clear();
+        front.insert(frontNew.begin(), frontNew.end());
+    } while (addedNew);
+    for (auto &nodePos: allPos) {
+        std::cout << nodePos << std::endl;
     }
     return 0;
 }

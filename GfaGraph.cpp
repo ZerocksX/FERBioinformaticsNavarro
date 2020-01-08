@@ -2,7 +2,6 @@
 // Created by pavao on 4.1.2020..
 //
 #include <fstream>
-#include <memory>
 #include <sstream>
 #include <utility>
 #include <vector>
@@ -49,7 +48,7 @@ GfaGraph *GfaGraph::loadFromFile(std::string fileName) {
         sstr >> dummy;
         sstr >> id;
         sstr >> seq;
-        gfaGraph->vertices[id] = std::make_shared<Node>(id, seq);
+        gfaGraph->vertices[id] = Node(id, seq);
     }
     for (const std::string &line : lLines) {
         std::stringstream sstr{line};
@@ -65,11 +64,20 @@ GfaGraph *GfaGraph::loadFromFile(std::string fileName) {
         sstr >> to;
         sstr >> toend;
         sstr >> overlap;
-        Node *fromNode = gfaGraph->vertices[from].get();
-        Node *toNode = gfaGraph->vertices[to].get();
-        Edge *edge = new Edge(std::shared_ptr<Node>(fromNode), std::shared_ptr<Node>(toNode), fromstart[0], toend[0],
-                              overlap);
-        fromNode->addChild(edge);
+        Node fromNode = gfaGraph->vertices[from];
+        Node toNode = gfaGraph->vertices[to];
+        Edge edge = Edge(fromNode, toNode, fromstart[0], toend[0],
+                         overlap);
+        fromNode.outEdges.insert(edge);
+        toNode.inEdges.emplace(
+                edge.to,
+                edge.from,
+                edge.toOrientation,
+                edge.fromOrientation,
+                edge.overlap
+        );
+        gfaGraph->vertices[from] = fromNode;
+        gfaGraph->vertices[to] = toNode;
     }
     return gfaGraph;
 }
@@ -77,64 +85,80 @@ GfaGraph *GfaGraph::loadFromFile(std::string fileName) {
 
 GfaGraph::GfaGraph() {}
 
-std::vector<std::shared_ptr<NodePosition>> NodePosition::next() {
-    std::vector<std::shared_ptr<NodePosition>> result;
-    std::string seq = this->node->sequence;
-    int n = this->node->sequence.size();
+std::vector<NodePosition> NodePosition::next() {
+    std::vector<NodePosition> result;
+    std::string seq = this->node.sequence;
+    int n = this->node.sequence.size();
     int pos = this->position + 1;
     if (pos < n) {
-        result.push_back(std::move(std::make_shared<NodePosition>(this->node, pos, this->edge, false, this->orientation)));
+        result.emplace_back(this->node, pos, this->edge, false, this->orientation);
     }
-    for (auto &it : this->node->outEdges) {
-        if ((n - it->overlap) == pos) {
-            result.push_back(std::move(std::make_shared<NodePosition>(it.get()->to, 0, std::shared_ptr<Edge>(it.get()), false, it->toOrientation)));
+    for (auto &it : this->node.outEdges) {
+        if ((n - it.overlap) == pos) {
+            result.emplace_back(it.to, 0, it, false,
+                                it.toOrientation);
         }
     }
     return result;
 }
 
-std::vector<std::shared_ptr<NodePosition>> NodePosition::previous() {
-    std::vector<std::shared_ptr<NodePosition>> result;
-    std::string seq = this->node->sequence;
-    int n = this->node->sequence.size();
+std::vector<NodePosition> NodePosition::previous() {
+    std::vector<NodePosition> result;
+    std::string seq = this->node.sequence;
+    int n = this->node.sequence.size();
     int pos = this->position + 1;
     if (pos < n) {
-        result.push_back(std::move(std::make_shared<NodePosition>(this->node, pos, this->edge, true, this->orientation)));
+        result.emplace_back(this->node, pos, this->edge, true, this->orientation);
     }
-    for (auto &it : this->node->inEdges) {
-        if ((n - it->overlap) == pos) {
-            result.push_back(std::move(std::make_shared<NodePosition>(this->node, 0, std::shared_ptr<Edge>(it.get()), true, it->toOrientation)));
+    for (auto &it : this->node.inEdges) {
+        if ((n - it.overlap) == pos) {
+            result.emplace_back(this->node, 0, it, true,
+                                it.toOrientation);
         }
     }
     return result;
 }
 
 char NodePosition::getCurrentChar() const {
-    int n = this->node->sequence.size();
+    int n = this->node.sequence.size();
     int p = this->reverse ? n - this->position - 1 : this->position;
     char c;
     if (this->orientation == '-') {
         p = n - p - 1;
-        c = reverseBase(this->node->sequence[p]);
+        c = reverseBase(this->node.sequence[p]);
     } else {
-        c = this->node->sequence[p];
+        c = this->node.sequence[p];
     }
     return c;
 }
 
-NodePosition::NodePosition(std::shared_ptr<Node> node, int position, std::shared_ptr<Edge> edge,
-                           bool reverse, char orientation) : node(std::move(node)), position(position), edge(std::move(edge)),
-                                           reverse(reverse), orientation(orientation) {}
 
-NodePosition::NodePosition(std::shared_ptr<Node> node, std::shared_ptr<Edge> edge) {
-    this->node = std::move(node);
+
+NodePosition::NodePosition(Node &node, Edge edge, bool reverse) {
+    this->node = node;
     this->position = 0;
-    this->edge = std::move(edge);
-    this->reverse = false;
-    this->orientation = this->edge->fromOrientation;
+    this->edge = edge;
+    this->reverse = reverse;
+    this->orientation = this->edge.fromOrientation;
 }
 
 std::ostream &operator<<(std::ostream &os, const NodePosition &position) {
-    os << "node: " << *position.node << " position: " << position.position << " reverse: " << position.reverse << " char: " << position.getCurrentChar();
+    os << "node: " << position.node << " position: " << position.position << " reverse: " << position.reverse
+       << " char: " << position.getCurrentChar();
     return os;
 }
+
+bool NodePosition::operator==(const NodePosition &rhs) const {
+    return node == rhs.node &&
+           position == rhs.position &&
+           edge == rhs.edge &&
+           reverse == rhs.reverse &&
+           orientation == rhs.orientation;
+}
+
+bool NodePosition::operator!=(const NodePosition &rhs) const {
+    return !(rhs == *this);
+}
+
+NodePosition::NodePosition(const Node &node, int position, const Edge &edge, bool reverse, char orientation) : node(
+        node), position(position), edge(edge), reverse(reverse), orientation(orientation) {}

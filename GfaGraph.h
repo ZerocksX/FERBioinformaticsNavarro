@@ -14,23 +14,27 @@
 
 class NodePosition {
 public:
-    std::shared_ptr<Node> node;
+    Node node;
     int position;
-    std::shared_ptr<Edge> edge;
+    Edge edge;
     bool reverse;
     char orientation;
 
-    std::vector<std::shared_ptr<NodePosition>> next();
+    std::vector<NodePosition> next();
 
-    std::vector<std::shared_ptr<NodePosition>> previous();
+    std::vector<NodePosition> previous();
 
     char getCurrentChar() const;
 
-    NodePosition(std::shared_ptr<Node> node, int position, std::shared_ptr<Edge> edge, bool reverse, char orientation);
+    NodePosition(const Node &node, int position, const Edge &edge, bool reverse, char orientation);
 
-    NodePosition(std::shared_ptr<Node> node, std::shared_ptr<Edge> edge);
+    NodePosition(Node &node, Edge edge, bool reverse);
 
     friend std::ostream &operator<<(std::ostream &os, const NodePosition &position);
+
+    bool operator==(const NodePosition &rhs) const;
+
+    bool operator!=(const NodePosition &rhs) const;
 };
 
 
@@ -38,14 +42,21 @@ namespace std {
     template<>
     struct hash<NodePosition> {
         size_t operator()(const NodePosition &x) const {
-            return hash<Node>()(x.node) ^ hash<int>()(x.position) ^ hash<Edge>()(x.edge) ^ hash<bool>()(x.reverse);
+            return hash<Node>()(x.node) ^ hash<int>()(x.position) ^ hash<Edge>()(x.edge) ^ hash<bool>()(x.reverse) ^
+                   hash<char>()(x.orientation);
+        }
+
+
+        size_t operator()(const std::shared_ptr<NodePosition> &x) const {
+            return hash<Node>()(x->node) ^ hash<int>()(x->position) ^ hash<Edge>()(x->edge) ^ hash<bool>()(x->reverse) ^
+                   hash<char>()(x->orientation);
         }
     };
 }
 
 class GfaGraph {
 public:
-    std::unordered_map<int, std::shared_ptr<Node>> vertices;
+    std::unordered_map<int, Node> vertices;
 
     static GfaGraph *loadFromFile(std::string fileName);
 
