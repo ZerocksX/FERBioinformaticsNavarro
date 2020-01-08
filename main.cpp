@@ -17,6 +17,8 @@ int main() {
 //            inputDir + "example.gfa"
     ));
     int n = graph->vertices.size();
+
+    //samo obicni nodeovi
     for (int i = 1; i <= n; ++i) {
         Node node = graph->vertices[i];
         std::cout << node.id << "(" << node.sequence << "): ";
@@ -26,6 +28,8 @@ int main() {
         }
         std::cout << std::endl;
     }
+
+    // posebni nodeovi koji idu char po char
     std::unordered_set<NodePosition> front;
     for (auto &it: graph->vertices) {
         Node node = it.second;
