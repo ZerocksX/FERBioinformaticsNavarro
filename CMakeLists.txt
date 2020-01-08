@@ -14,8 +14,8 @@ include_directories(${GA_DIR})
 set(CMAKE_CXX_STANDARD 14)
 
 
-set(imports ${GA_DIR}/GfaGraph.cpp ${GA_DIR}/GfaGraph.h ${GA_DIR}/ThreadReadAssertion.cpp ${GA_DIR}/ThreadReadAssertion.h)
+#set(imports ${GA_DIR}/GfaGraph.cpp ${GA_DIR}/GfaGraph.h ${GA_DIR}/ThreadReadAssertion.cpp ${GA_DIR}/ThreadReadAssertion.h)
 
-add_executable(navarro main.cpp ${imports})
+add_executable(navarro main.cpp ${imports} GfaGraph.cpp GfaGraph.h Node.cpp Node.h)
 target_include_directories(navarro PRIVATE ${GA_DIR})
 #target_link_libraries(navarro ${GA})
