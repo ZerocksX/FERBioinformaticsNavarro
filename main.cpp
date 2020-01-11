@@ -63,8 +63,11 @@ int main() {
     //allPos su svi node-ovi onda se na njima radi previous i sto vec treba
     //preporucam za onaj Cv radit novu unordered_map<NodePosition, int> pa imat Cv i Cv' mape za racunanje 'retka' i novog 'retka'
     std::cout << "All node(char): " << std::endl;
-    for (auto &nodePos: allPos) {
-        std::cout << nodePos << std::endl;
+    for (auto nodePos: allPos) {
+        std::cout << nodePos << std::endl << std::endl;
+        for(auto parent : nodePos.previous(graph.get())){
+            std::cout << parent << " ";
+        }std::cout << std::endl << "end" << std::endl;
     }
     return 0;
 }

@@ -112,8 +112,7 @@ std::vector<NodePosition> NodePosition::previous(GfaGraph *gfaGraph) {
     }
     for (auto &it : this->node.inEdges) {
         if ((n - it.overlap) == pos) {
-            result.emplace_back(gfaGraph->vertices[it.to], 0, it, true,
-                                it.toOrientation);
+            result.emplace_back(gfaGraph->vertices[it.to], 0, it, true, it.toOrientation);
         }
     }
     return result;
@@ -131,7 +130,6 @@ char NodePosition::getCurrentChar() const {
     }
     return c;
 }
-
 
 
 NodePosition::NodePosition(Node &node, Edge edge, bool reverse) {
