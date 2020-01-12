@@ -49,6 +49,6 @@ bool Node::operator>=(const Node &rhs) const {
 }
 
 std::ostream &operator<<(std::ostream &os, const Node &node) {
-    os << "id: " << node.id << " sequence: " << node.sequence;
+    os << "id: " << node.id << " sequence: " << node.sequence.substr(0, std::min(50ul, node.sequence.size()));
     return os;
 }

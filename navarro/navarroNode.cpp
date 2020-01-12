@@ -12,30 +12,35 @@ int score(FastQ fastQ, std::unordered_set<NodePosition> &nodes, GfaGraph *gfaGra
     }
 
     int m = fastQ.sequence.size();
-
+    std::cout << cv.size() << std::endl;
     for (int i = 1; i <= m; i++) {
-        std::unordered_map<NodePosition, int> cvTemp;
         char c = fastQ.sequence[i - 1];
         if (i % 100 == 0) {
             std::cout << "Round: " << i << " of " << m << std::endl;
         }
+        std::unordered_map<NodePosition, int> cvTemp;
         for (auto &node : nodes) {
             cvTemp[node] = g(node, i, c, gfaGraph, cv);
         }
-        cv = cvTemp;
+//        cv = cvTemp;
         for (auto &node : nodes) {
             cv[node] = cvTemp[node];
+        }
+        for (auto &node : nodes) {
+            for (auto &child : node.next(gfaGraph)) {
+                propagate(node, child, gfaGraph, cv);
+            }
         }
     }
     int min = 1 << 30u;
     for (auto &nodeScore : cv) {
-        std::cout << nodeScore.first.position << " " << nodeScore.first.getCurrentChar() << " -> " << nodeScore.second << std::endl;
+        std::cout << nodeScore.first << " -> " << nodeScore.second << std::endl;
         min = std::min(nodeScore.second, min);
     }
     return min;
 }
 
-int g(NodePosition node, int i, char c, GfaGraph *gfaGraph, std::unordered_map<NodePosition, int> &cv) {
+int g(const NodePosition &node, int i, char c, GfaGraph *gfaGraph, std::unordered_map<NodePosition, int> &cv) {
     if (c == node.getCurrentChar()) {
         int min = i - 1;
         for (auto &parent : node.previous(gfaGraph)) {
@@ -52,5 +57,23 @@ int g(NodePosition node, int i, char c, GfaGraph *gfaGraph, std::unordered_map<N
             min = std::min(cv[parent], min);
         }
         return 1 + std::min(min, cv[node]);
+    }
+}
+
+/*
+ * Propagate (u,v)
+if Cv>1 + Cu
+Cv ← 1 + Cu
+for all z=(v; z)∈E
+Propagate (v,z)
+ * */
+
+void
+propagate(const NodePosition &u, const NodePosition &v, GfaGraph *graph, std::unordered_map<NodePosition, int> &cv) {
+    if (cv[v] >  1 + cv[u]) {
+        cv[v] = 1 + cv[u];
+        for (const auto &z : v.next(graph)) {
+            propagate(v, z, graph, cv);
+        }
     }
 }

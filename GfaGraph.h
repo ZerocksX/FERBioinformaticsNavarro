@@ -28,19 +28,18 @@ public:
     Node node;
     int position;
     Edge edge;
-    bool reverse;
     char orientation;
 
-    std::vector<NodePosition> next(GfaGraph *gfaGraph);
+    std::vector<NodePosition> next(GfaGraph *gfaGraph) const;
 
-    std::vector<NodePosition> previous(GfaGraph *gfaGraph);
+    std::vector<NodePosition> previous(GfaGraph *gfaGraph) const;
 
     char getCurrentChar() const;
 
-    NodePosition(const Node &node, int position, const Edge &edge, bool reverse, char orientation);
+    NodePosition(const Node &node, int position, const Edge &edge, char orientation);
 
-    NodePosition(Node &node, Edge edge, bool reverse);
-    NodePosition(Node &node, bool reverse);
+    NodePosition(Node &node, Edge edge);
+    NodePosition(Node &node);
 
     friend std::ostream &operator<<(std::ostream &os, const NodePosition &position);
 
@@ -54,13 +53,13 @@ namespace std {
     template<>
     struct hash<NodePosition> {
         size_t operator()(const NodePosition &x) const {
-            return hash<Node>()(x.node) ^ hash<int>()(x.position) ^ /*hash<Edge>()(x.edge) ^*/ hash<bool>()(x.reverse) ^
+            return hash<Node>()(x.node) ^ hash<int>()(x.position) ^ /*hash<Edge>()(x.edge) ^*/
                    hash<char>()(x.orientation);
         }
 
 
         size_t operator()(const std::shared_ptr<NodePosition> &x) const {
-            return hash<Node>()(x->node) ^ hash<int>()(x->position) ^ /*hash<Edge>()(x->edge) ^*/ hash<bool>()(x->reverse) ^
+            return hash<Node>()(x->node) ^ hash<int>()(x->position) ^ /*hash<Edge>()(x->edge) ^*/
                    hash<char>()(x->orientation);
         }
     };

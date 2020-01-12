@@ -85,34 +85,43 @@ GfaGraph *GfaGraph::loadFromFile(std::string fileName) {
 
 GfaGraph::GfaGraph() {}
 
-std::vector<NodePosition> NodePosition::next(GfaGraph *gfaGraph) {
+std::vector<NodePosition> NodePosition::next(GfaGraph *gfaGraph) const {
     std::vector<NodePosition> result;
     std::string seq = this->node.sequence;
     int n = this->node.sequence.size();
     int pos = this->position + 1;
-    if (pos < n) {
-        result.emplace_back(this->node, pos, this->edge, false, this->orientation);
+    if (pos < n && pos >= 0) {
+        result.emplace_back(this->node, pos, this->edge, this->orientation);
     }
     for (auto &it : this->node.outEdges) {
         if ((n - it.overlap) == pos) {
-            result.emplace_back(gfaGraph->vertices[it.to], 0, it, false,
-                                it.toOrientation);
+            result.emplace_back(
+                    gfaGraph->vertices[it.to],
+                    0,
+                    it,
+                    it.toOrientation
+            );
         }
     }
     return result;
 }
 
-std::vector<NodePosition> NodePosition::previous(GfaGraph *gfaGraph) {
+std::vector<NodePosition> NodePosition::previous(GfaGraph *gfaGraph) const {
     std::vector<NodePosition> result;
     std::string seq = this->node.sequence;
     int n = this->node.sequence.size();
-    int pos = this->position + 1;
-    if (pos < n) {
-        result.emplace_back(this->node, pos, this->edge, true, this->orientation);
+    int pos = this->position - 1;
+    if (pos < n && pos >= 0) {
+        result.emplace_back(this->node, pos, this->edge, this->orientation);
     }
     for (auto &it : this->node.inEdges) {
-        if ((n - it.overlap) == pos) {
-            result.emplace_back(gfaGraph->vertices[it.to], 0, it, true, it.toOrientation);
+        if (it.overlap - 1 == pos) {
+            result.emplace_back(
+                    gfaGraph->vertices[it.to],
+                    gfaGraph->vertices[it.to].sequence.size() - 1,
+                    it,
+                    it.toOrientation
+            );
         }
     }
     return result;
@@ -120,7 +129,7 @@ std::vector<NodePosition> NodePosition::previous(GfaGraph *gfaGraph) {
 
 char NodePosition::getCurrentChar() const {
     int n = this->node.sequence.size();
-    int p = this->reverse ? n - this->position - 1 : this->position;
+    int p = this->position;
     char c;
     if (this->orientation == '-') {
         p = n - p - 1;
@@ -132,25 +141,23 @@ char NodePosition::getCurrentChar() const {
 }
 
 
-NodePosition::NodePosition(Node &node, Edge edge, bool reverse) {
+NodePosition::NodePosition(Node &node, Edge edge) {
     this->node = node;
     this->position = 0;
     this->edge = edge;
-    this->reverse = reverse;
     this->orientation = this->edge.fromOrientation;
 }
 
 
-NodePosition::NodePosition(Node &node, bool reverse) {
+NodePosition::NodePosition(Node &node) {
     this->node = node;
     this->position = 0;
-    this->reverse = reverse;
     this->orientation = '+';
 
 }
 
 std::ostream &operator<<(std::ostream &os, const NodePosition &position) {
-    os << "node: " << position.node << " position: " << position.position << " reverse: " << position.reverse
+    os << "node: " << position.node << " position: " << position.position
        << " char: " << position.getCurrentChar();
     return os;
 }
@@ -158,8 +165,7 @@ std::ostream &operator<<(std::ostream &os, const NodePosition &position) {
 bool NodePosition::operator==(const NodePosition &rhs) const {
     return node == rhs.node &&
            position == rhs.position &&
-//           edge == rhs.edge &&
-           reverse == rhs.reverse &&
+           //           edge == rhs.edge &&
            orientation == rhs.orientation;
 }
 
@@ -167,6 +173,10 @@ bool NodePosition::operator!=(const NodePosition &rhs) const {
     return !(rhs == *this);
 }
 
-NodePosition::NodePosition(const Node &node, int position, const Edge &edge, bool reverse, char orientation) : node(
-        node), position(position), edge(edge), reverse(reverse), orientation(orientation) {}
+NodePosition::NodePosition(const Node &node, int position, const Edge &edge, char orientation) : node(node),
+                                                                                                 position(position),
+                                                                                                 edge(edge),
+                                                                                                 orientation(
+                                                                                                         orientation) {}
+
 
