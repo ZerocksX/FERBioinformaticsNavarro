@@ -1,0 +1,62 @@
+
+
+Start ACO Algorithm
+
+termination criterion = number of iterations
+
+initialize vertices, edges, capacityLimits, numberOfVehicles, demands, pheromones and timeWindows
+
+while (!termination criterion)
+
+	for each ant do
+
+		calculate solution_of_an_ant()
+
+	end for
+
+	update pheromones according to k best solutions with fewest number of unvisited customers:
+		apply evaporation strategy
+		apply reinforcement strategy
+
+	update pheromones according to k solutions with fewest number of vehicle:
+		apply evaporation strategy
+		apply reinforcement strategy
+
+end while
+
+write the best solution in file
+
+
+solution_of_an_ant():
+
+	while(!(all customers visited and all vehicles used))
+
+		initialize path <- start from depot
+
+		while(!all customers visited)
+
+			calculate distances to each of remaining customers
+
+			calculate probabilities of choosing a next customer
+
+			calculate finish time, capacity, current time
+
+			if(vehicle capacity > 0 and current time < due time of a choosen customer and finish time < due time of a vehicle)
+
+				calculate waiting time until serving the customer
+
+				update path, times, remaining customers
+
+			else
+
+				finish path <- return to depot
+
+		end while
+
+		update solution with finalized path
+
+	end while
+
+
+
+
