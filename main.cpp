@@ -16,7 +16,8 @@ int main() {
 //            inputDir + "ref10000_tangle.gfa"
 //            inputDir + "ref10000_snp.gfa"
 //            inputDir + "ref10000_twopath.gfa"
-            inputDir + "example.gfa"
+            inputDir + "ref10000_linear.gfa"
+//            inputDir + "example.gfa"
     ));
     int n = graph->vertices.size();
 
@@ -37,6 +38,9 @@ int main() {
         Node node = it.second;
         for (auto &e: node.inEdges) {
             front.insert(NodePosition(node, e, true));
+        }
+        if(node.inEdges.empty()){
+            front.insert(NodePosition(node, true));
         }
     }
     std::unordered_set<NodePosition> allPos;
@@ -64,20 +68,24 @@ int main() {
     } while (addedNew);
     //allPos su svi node-ovi onda se na njima radi previous i sto vec treba
     //preporucam za onaj Cv radit novu unordered_map<NodePosition, int> pa imat Cv i Cv' mape za racunanje 'retka' i novog 'retka'
-//    std::cout << "All node(char): " << std::endl;
-//    for (auto nodePos: allPos) {
+    std::cout << "All node(char): " << std::endl;
+    for (auto nodePos: allPos) {
 //        std::cout << nodePos << std::endl << std::endl;
-//        for(auto parent : nodePos.previous(graph.get())){
+        std::cout << nodePos.position << " " << nodePos.getCurrentChar() << std::endl << std::endl;
+
+        for(auto parent : nodePos.previous(graph.get())){
 //            std::cout << parent << " ";
-//        }std::cout << std::endl << "end" << std::endl;
-//    }
+            std::cout << parent.position << " " << parent.getCurrentChar() << " ";
+        }std::cout << std::endl << "end" << std::endl;
+    }
 
     std::vector<FastQ> queries = loadFastqFromFile(
-//            R"(C:\Users\pavao\Documents\faks\bioinf\lab\navarro\input\ref10000_simulatedreads.fastq)"
-            R"(C:\Users\pavao\Documents\faks\bioinf\lab\navarro\input\example.fastq)"
+            R"(C:\Users\pavao\Documents\faks\bioinf\lab\navarro\input\ref10000_simulatedreads.fastq)"
+//            R"(C:\Users\pavao\Documents\faks\bioinf\lab\navarro\input\example.fastq)"
             );
 
-    int s = score(queries[0], allPos, graph.get());
+    int s = score(queries[19], allPos, graph.get());
+//    int s = score(queries[0], allPos, graph.get());
     std::cout << s << std::endl;
     return 0;
 }

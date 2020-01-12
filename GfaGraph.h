@@ -40,6 +40,7 @@ public:
     NodePosition(const Node &node, int position, const Edge &edge, bool reverse, char orientation);
 
     NodePosition(Node &node, Edge edge, bool reverse);
+    NodePosition(Node &node, bool reverse);
 
     friend std::ostream &operator<<(std::ostream &os, const NodePosition &position);
 
@@ -53,13 +54,13 @@ namespace std {
     template<>
     struct hash<NodePosition> {
         size_t operator()(const NodePosition &x) const {
-            return hash<Node>()(x.node) ^ hash<int>()(x.position) ^ hash<Edge>()(x.edge) ^ hash<bool>()(x.reverse) ^
+            return hash<Node>()(x.node) ^ hash<int>()(x.position) ^ /*hash<Edge>()(x.edge) ^*/ hash<bool>()(x.reverse) ^
                    hash<char>()(x.orientation);
         }
 
 
         size_t operator()(const std::shared_ptr<NodePosition> &x) const {
-            return hash<Node>()(x->node) ^ hash<int>()(x->position) ^ hash<Edge>()(x->edge) ^ hash<bool>()(x->reverse) ^
+            return hash<Node>()(x->node) ^ hash<int>()(x->position) ^ /*hash<Edge>()(x->edge) ^*/ hash<bool>()(x->reverse) ^
                    hash<char>()(x->orientation);
         }
     };

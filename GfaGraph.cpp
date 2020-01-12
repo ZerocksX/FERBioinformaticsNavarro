@@ -140,6 +140,15 @@ NodePosition::NodePosition(Node &node, Edge edge, bool reverse) {
     this->orientation = this->edge.fromOrientation;
 }
 
+
+NodePosition::NodePosition(Node &node, bool reverse) {
+    this->node = node;
+    this->position = 0;
+    this->reverse = reverse;
+    this->orientation = '+';
+
+}
+
 std::ostream &operator<<(std::ostream &os, const NodePosition &position) {
     os << "node: " << position.node << " position: " << position.position << " reverse: " << position.reverse
        << " char: " << position.getCurrentChar();
@@ -149,7 +158,7 @@ std::ostream &operator<<(std::ostream &os, const NodePosition &position) {
 bool NodePosition::operator==(const NodePosition &rhs) const {
     return node == rhs.node &&
            position == rhs.position &&
-           edge == rhs.edge &&
+//           edge == rhs.edge &&
            reverse == rhs.reverse &&
            orientation == rhs.orientation;
 }
@@ -160,3 +169,4 @@ bool NodePosition::operator!=(const NodePosition &rhs) const {
 
 NodePosition::NodePosition(const Node &node, int position, const Edge &edge, bool reverse, char orientation) : node(
         node), position(position), edge(edge), reverse(reverse), orientation(orientation) {}
+
