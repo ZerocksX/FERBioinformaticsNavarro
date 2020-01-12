@@ -10,11 +10,11 @@
 #include <unordered_set>
 #include "../GfaGraph.h"
 
-int g(int node, int i, char c, NodePositionGraph& graph, std::unordered_map<int, int> &cv);
+int g(int node, int i, char c, NodePositionGraph& graph, std::vector<int> &cv);
 
 int score(FastQ fastQ, NodePositionGraph &graph);
 
 void
-propagate(int u, int v, NodePositionGraph &graph, std::unordered_map<int, int> &cv);
+propagate(int u, int v, NodePositionGraph &graph, std::vector<int> &cv);
 
 #endif //NAVARRO_NAVARRONODE_H

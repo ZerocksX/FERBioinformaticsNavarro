@@ -5,7 +5,7 @@
 #include "navarroNode.h"
 
 int score(FastQ fastQ, NodePositionGraph &graph) {
-    std::unordered_map<int, int> cv;
+    std::vector<int> cv(graph.n);
 
     for (int i = 0; i < graph.n; ++i) {
         cv[i] = 0;
@@ -15,10 +15,10 @@ int score(FastQ fastQ, NodePositionGraph &graph) {
 //    std::cout << cv.size() << std::endl;
     for (int i = 1; i <= m; i++) {
         char c = fastQ.sequence[i - 1];
-        if (i % 100 == 0) {
-            std::cout << "Round: " << i << " of " << m << std::endl;
-        }
-        std::unordered_map<int, int> cvTemp;
+//        if (i % 100 == 0) {
+//            std::cout << "Round: " << i << " of " << m << std::endl;
+//        }
+        std::vector<int> cvTemp(graph.n);
         for (int node = 0; node < graph.n; ++node) {
             cvTemp[node] = g(node, i, c, graph, cv);
         }
@@ -37,7 +37,7 @@ int score(FastQ fastQ, NodePositionGraph &graph) {
     return min;
 }
 
-int g(int node, int i, char c, NodePositionGraph &graph, std::unordered_map<int, int> &cv) {
+int g(int node, int i, char c, NodePositionGraph &graph, std::vector<int> &cv) {
     if (c == graph.nodes[node].getCurrentChar()) {
         int min = i - 1;
         for (int parent : graph.previousNodes[node]) {
@@ -56,7 +56,7 @@ int g(int node, int i, char c, NodePositionGraph &graph, std::unordered_map<int,
     }
 }
 
-void propagate(int u, int v, NodePositionGraph &graph, std::unordered_map<int, int> &cv) {
+void propagate(int u, int v, NodePositionGraph &graph, std::vector<int> &cv) {
     if (cv[v] > 1 + cv[u]) {
         cv[v] = 1 + cv[u];
         for (int child : graph.nextNodes[v]) {
