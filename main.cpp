@@ -2,7 +2,9 @@
 #include <algorithm>
 #include <memory>
 #include <set>
+#include <fastqloader.h>
 #include "GfaGraph.h"
+#include "navarro/navarroNode.h"
 
 std::unique_ptr<GfaGraph> graph;
 
@@ -19,15 +21,15 @@ int main() {
     int n = graph->vertices.size();
 
     //samo obicni nodeovi
-    for (int i = 1; i <= n; ++i) {
-        Node node = graph->vertices[i];
-        std::cout << node.id << "(" << node.sequence << "): ";
-        for (auto &it : node.outEdges) {
-            Node child = graph->vertices[it.to];
-            std::cout << child.id << "(" << child.sequence << "), ";
-        }
-        std::cout << std::endl;
-    }
+//    for (int i = 1; i <= n; ++i) {
+//        Node node = graph->vertices[i];
+//        std::cout << node.id << "(" << node.sequence << "): ";
+//        for (auto &it : node.outEdges) {
+//            Node child = graph->vertices[it.to];
+//            std::cout << child.id << "(" << child.sequence << "), ";
+//        }
+//        std::cout << std::endl;
+//    }
 
     // posebni nodeovi koji idu char po char
     std::unordered_set<NodePosition> front;
@@ -52,22 +54,30 @@ int main() {
                 }
             }
         }
-        std::cout << "size: " << frontNew.size() << std::endl;
-        for(auto p : frontNew){
-            std::cout << p << std::endl;
-        }
+//        std::cout << "size: " << frontNew.size() << std::endl;
+//        for(auto p : frontNew){
+//            std::cout << p << std::endl;
+//        }
         front.clear();
         front.insert(frontNew.begin(), frontNew.end());
         allPos.insert(front.begin(), front.end());
     } while (addedNew);
     //allPos su svi node-ovi onda se na njima radi previous i sto vec treba
     //preporucam za onaj Cv radit novu unordered_map<NodePosition, int> pa imat Cv i Cv' mape za racunanje 'retka' i novog 'retka'
-    std::cout << "All node(char): " << std::endl;
-    for (auto nodePos: allPos) {
-        std::cout << nodePos << std::endl << std::endl;
-        for(auto parent : nodePos.previous(graph.get())){
-            std::cout << parent << " ";
-        }std::cout << std::endl << "end" << std::endl;
-    }
+//    std::cout << "All node(char): " << std::endl;
+//    for (auto nodePos: allPos) {
+//        std::cout << nodePos << std::endl << std::endl;
+//        for(auto parent : nodePos.previous(graph.get())){
+//            std::cout << parent << " ";
+//        }std::cout << std::endl << "end" << std::endl;
+//    }
+
+    std::vector<FastQ> queries = loadFastqFromFile(
+//            R"(C:\Users\pavao\Documents\faks\bioinf\lab\navarro\input\ref10000_simulatedreads.fastq)"
+            R"(C:\Users\pavao\Documents\faks\bioinf\lab\navarro\input\example.fastq)"
+            );
+
+    int s = score(queries[0], allPos, graph.get());
+    std::cout << s << std::endl;
     return 0;
 }
