@@ -14,9 +14,9 @@ int main() {
 //            inputDir + "ref10000_linear.gfa"
 //            inputDir + "jere/ref10000_onechar.gfa"
 //    inputDir + "jere/ref10000_snp.gfa"
-    inputDir + "jere/ref10000_twopath.gfa"
+//    inputDir + "jere/ref10000_twopath.gfa"
 //            inputDir + "ref10000_onechar.gfa"
-//            inputDir + "ref10000_tangle.gfa"
+            inputDir + "ref10000_tangle.gfa"
 //            inputDir + "ref10000_snp.gfa"
 //            inputDir + "ref10000_twopath.gfa"
 //            inputDir + "example.gfa"
@@ -96,12 +96,12 @@ int main() {
     }
 
     std::vector<FastQ> queries = loadFastqFromFile(
-//            R"(C:\Users\pavao\Documents\faks\bioinf\lab\navarro\input\ref10000_simulatedreads.fastq)"
-                    R"(C:\Users\pavao\Documents\faks\bioinf\lab\navarro\input\jere\ref10000_simulatedreads.fastq)"
+            R"(C:\Users\pavao\Documents\faks\bioinf\lab\navarro\input\ref10000_simulatedreads.fastq)"
+//                    R"(C:\Users\pavao\Documents\faks\bioinf\lab\navarro\input\jere\ref10000_simulatedreads.fastq)"
 //            R"(C:\Users\pavao\Documents\faks\bioinf\lab\navarro\input\example.fastq)"
     );
 
-    int s = score(queries[0], allPos, graph.get());
+    int s = score(queries[20], allPos, graph.get());
 //    int s = score(queries[0], allPos, graph.get());
     std::cout << s << std::endl;
     return 0;
