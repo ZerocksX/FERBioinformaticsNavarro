@@ -1,0 +1,21 @@
+load graph
+798 original nodes
+818 split nodes
+19814bp
+1402 edges
+578 nodes with in-degree >= 2
+load reads
+preprocess graph
+The graph is cyclic
+Collapsed nodes: 818
+Collapsed edges: 1402
+Nodes: 19814
+Edges: 20398
+BPs: 19814
+start bitvector alignment
+bitvector took 15570701us
+start cellbycell alignment
+cellbycell took 164084998us
+ratio: 10.5381
+240 420 380 397 374 1303 556 274 312 230 418 475 258 903 504 210 848 528 1260 109 288 792 646 727 336 183 575 676 294 833 542 406 245 668 378 202 505 266 392 240 612 413 669 242 151 598 355 1647 619 184 204 131 273 103 438 685 742 889 713 217 237 581 219 510 587 243 253 84 440 299 311 1029 435 141 381 397 298 
+scores match

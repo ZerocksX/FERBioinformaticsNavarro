@@ -85,45 +85,51 @@ GfaGraph *GfaGraph::loadFromFile(std::string fileName) {
 
 GfaGraph::GfaGraph() {}
 
-std::vector<NodePosition> NodePosition::next(GfaGraph *gfaGraph) const {
+std::vector<NodePosition> NodePosition::next(GfaGraph *gfaGraph) {
+    if (!this->nextNodes.empty()) {
+        return this->nextNodes;
+    }
     std::vector<NodePosition> result;
     std::string seq = this->node.sequence;
     int n = this->node.sequence.size();
     int pos = this->position + 1;
     if (pos < n && pos >= 0) {
-        result.emplace_back(this->node, pos, this->edge, this->orientation);
+        result.emplace_back(this->node, pos, this->orientation);
     }
     for (auto &it : this->node.outEdges) {
         if ((n - it.overlap) == pos) {
             result.emplace_back(
                     gfaGraph->vertices[it.to],
                     0,
-                    it,
                     it.toOrientation
             );
         }
     }
+    this->nextNodes.insert(this->nextNodes.begin(), result.begin(), result.end());
     return result;
 }
 
-std::vector<NodePosition> NodePosition::previous(GfaGraph *gfaGraph) const {
+std::vector<NodePosition> NodePosition::previous(GfaGraph *gfaGraph) {
+    if (!this->previousNodes.empty()) {
+        return this->previousNodes;
+    }
     std::vector<NodePosition> result;
     std::string seq = this->node.sequence;
     int n = this->node.sequence.size();
     int pos = this->position - 1;
     if (pos < n && pos >= 0) {
-        result.emplace_back(this->node, pos, this->edge, this->orientation);
+        result.emplace_back(this->node, pos, this->orientation);
     }
     for (auto &it : this->node.inEdges) {
         if (it.overlap - 1 == pos) {
             result.emplace_back(
                     gfaGraph->vertices[it.to],
                     gfaGraph->vertices[it.to].sequence.size() - 1,
-                    it,
                     it.toOrientation
             );
         }
     }
+    this->previousNodes.insert(this->previousNodes.begin(), result.begin(), result.end());
     return result;
 }
 
@@ -141,19 +147,11 @@ char NodePosition::getCurrentChar() const {
 }
 
 
-NodePosition::NodePosition(Node &node, Edge edge) {
-    this->node = node;
-    this->position = 0;
-    this->edge = edge;
-    this->orientation = this->edge.fromOrientation;
+NodePosition::NodePosition(Node &node, Edge edge) : NodePosition(node, 0, edge.fromOrientation) {
 }
 
 
-NodePosition::NodePosition(Node &node) {
-    this->node = node;
-    this->position = 0;
-    this->orientation = '+';
-
+NodePosition::NodePosition(Node &node) : NodePosition(node, 0, '+') {
 }
 
 std::ostream &operator<<(std::ostream &os, const NodePosition &position) {
@@ -165,7 +163,6 @@ std::ostream &operator<<(std::ostream &os, const NodePosition &position) {
 bool NodePosition::operator==(const NodePosition &rhs) const {
     return node == rhs.node &&
            position == rhs.position &&
-           //           edge == rhs.edge &&
            orientation == rhs.orientation;
 }
 
@@ -173,10 +170,27 @@ bool NodePosition::operator!=(const NodePosition &rhs) const {
     return !(rhs == *this);
 }
 
-NodePosition::NodePosition(const Node &node, int position, const Edge &edge, char orientation) : node(node),
-                                                                                                 position(position),
-                                                                                                 edge(edge),
-                                                                                                 orientation(
-                                                                                                         orientation) {}
+NodePosition::NodePosition(Node node, int position, char orientation) : node(std::move(node)), position(position),
+                                                                        orientation(orientation) {
+}
 
 
+NodePositionGraph::NodePositionGraph(const std::unordered_set<NodePosition> &nodes, GfaGraph *gfaGraph) {
+    int i = 0;
+    this->n = nodes.size();
+    for (const auto &node: nodes) {
+        this->nodes.push_back(node);
+        this->positions[node] = i;
+        this->nextNodes.emplace_back();
+        this->previousNodes.emplace_back();
+        i++;
+    }
+    for (int node = 0; node < n; ++node) {
+        for (const auto &parent : this->nodes[node].previous(gfaGraph)) {
+            this->previousNodes[node].push_back(this->positions[parent]);
+        }
+        for (const auto &child : this->nodes[node].next(gfaGraph)) {
+            this->nextNodes[node].push_back(this->positions[child]);
+        }
+    }
+}

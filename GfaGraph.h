@@ -12,7 +12,6 @@
 #include "Node.h"
 
 
-
 class GfaGraph {
 public:
     std::unordered_map<int, Node> vertices;
@@ -23,23 +22,26 @@ private:
     GfaGraph();
 };
 
+
 class NodePosition {
 public:
+    NodePosition(Node &node, Edge edge);
+
     Node node;
     int position;
-    Edge edge;
     char orientation;
+    std::vector<NodePosition> previousNodes;
+    std::vector<NodePosition> nextNodes;
 
-    std::vector<NodePosition> next(GfaGraph *gfaGraph) const;
+    std::vector<NodePosition> next(GfaGraph *gfaGraph);
 
-    std::vector<NodePosition> previous(GfaGraph *gfaGraph) const;
+    std::vector<NodePosition> previous(GfaGraph *gfaGraph);
 
     char getCurrentChar() const;
 
-    NodePosition(const Node &node, int position, const Edge &edge, char orientation);
+    NodePosition(Node node, int position, char orNode);
 
-    NodePosition(Node &node, Edge edge);
-    NodePosition(Node &node);
+    explicit NodePosition(Node &node);
 
     friend std::ostream &operator<<(std::ostream &os, const NodePosition &position);
 
@@ -64,6 +66,18 @@ namespace std {
         }
     };
 }
+
+
+class NodePositionGraph {
+public:
+    NodePositionGraph(const std::unordered_set<NodePosition> &nodes, GfaGraph *gfaGraph);
+    int n;
+    std::unordered_map<NodePosition, int> positions;
+    std::vector<NodePosition> nodes;
+    std::vector<std::vector<int>> nextNodes;
+    std::vector<std::vector<int>> previousNodes;
+
+};
 
 
 #endif //NAVARRO_GFAGRAPH_H

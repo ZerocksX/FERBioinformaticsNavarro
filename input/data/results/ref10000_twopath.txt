@@ -1,0 +1,21 @@
+load graph
+40004 original nodes
+40004 split nodes
+40004bp
+80000 edges
+40000 nodes with in-degree >= 2
+load reads
+preprocess graph
+The graph is a DAG
+Collapsed nodes: 40004
+Collapsed edges: 80000
+Nodes: 40004
+Edges: 80000
+BPs: 40004
+start bitvector alignment
+bitvector took 25343871us
+start cellbycell alignment
+cellbycell took 445800338us
+ratio: 17.5901
+214 376 336 359 330 1160 503 244 274 201 367 431 224 797 455 184 750 474 1112 94 248 704 569 651 289 170 524 596 263 758 472 358 216 594 335 182 440 237 334 217 545 363 598 216 134 517 317 1469 543 167 180 117 240 87 385 608 651 781 619 190 208 520 192 454 520 219 225 72 391 265 273 929 383 119 339 349 271 
+scores match
