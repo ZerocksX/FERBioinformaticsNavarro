@@ -10,11 +10,25 @@
 #include <unordered_set>
 #include "../GfaGraph.h"
 
-int g(int node, int i, char c, NodePositionGraph& graph, std::vector<int> &cv);
+class Matching {
+public:
+    int parentRow;
+    int parentColumn;
+    int op;
 
-int score(FastQ fastQ, NodePositionGraph &graph);
+    Matching(int parentRow, int parentColumn, int op);
+
+    Matching();
+
+};
+
+int g(int node, int i, char c, NodePositionGraph &graph, std::vector<int> &cv,
+      std::vector<std::vector<Matching>> &backtrack);
+
+std::vector<int> score(FastQ fastQ, NodePositionGraph &graph, std::vector<std::vector<Matching>> &backtrack);
 
 void
-propagate(int u, int v, NodePositionGraph &graph, std::vector<int> &cv);
+propagate(int u, int v, NodePositionGraph &graph, std::vector<int> &cv, std::vector<std::vector<Matching>> &backtrack,
+          int i);
 
 #endif //NAVARRO_NAVARRONODE_H

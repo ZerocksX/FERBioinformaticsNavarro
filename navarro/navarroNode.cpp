@@ -4,7 +4,8 @@
 #include <iostream>
 #include "navarroNode.h"
 
-int score(FastQ fastQ, NodePositionGraph &graph) {
+std::vector<int> score(FastQ fastQ, NodePositionGraph &graph, std::vector<std::vector<Matching>> &backtrack) {
+
     std::vector<int> cv(graph.n);
 
     for (int i = 0; i < graph.n; ++i) {
@@ -12,6 +13,7 @@ int score(FastQ fastQ, NodePositionGraph &graph) {
     }
 
     int m = fastQ.sequence.size();
+
 //    std::cout << cv.size() << std::endl;
     for (int i = 1; i <= m; i++) {
         char c = fastQ.sequence[i - 1];
@@ -20,47 +22,64 @@ int score(FastQ fastQ, NodePositionGraph &graph) {
 //        }
         std::vector<int> cvTemp(graph.n);
         for (int node = 0; node < graph.n; ++node) {
-            cvTemp[node] = g(node, i, c, graph, cv);
+            cvTemp[node] = g(node, i, c, graph, cv, backtrack);
         }
         cv = cvTemp;
         for (int node = 0; node < graph.n; ++node) {
             for (int child : graph.nextNodes[node]) {
-                propagate(node, child, graph, cv);
+                propagate(node, child, graph, cv, backtrack, i);
             }
         }
     }
-    int min = 1 << 30u;
-    for (int k = 0; k < graph.n; ++k) {
-//        std::cout << graph.nodes[k] << " -> " << cv[k] << std::endl;
-        min = std::min(cv[k], min);
-    }
-    return min;
+    return cv;
 }
 
-int g(int node, int i, char c, NodePositionGraph &graph, std::vector<int> &cv) {
+int g(int node, int i, char c, NodePositionGraph &graph, std::vector<int> &cv,
+      std::vector<std::vector<Matching>> &backtrack) {
     if (c == graph.nodes[node].getCurrentChar()) {
         int min = i - 1;
+        backtrack[i][node] = Matching(-1, -1, 0);//beginning
         for (int parent : graph.previousNodes[node]) {
-            min = std::min(cv[parent], min);
+            if (cv[parent] < min) {
+                min = cv[parent];
+                backtrack[i][node] = Matching(i - 1, parent, 0);//match
+            }
         }
         return min;
     } else {
         if (graph.previousNodes[node].empty()) {
+            backtrack[i][node] = Matching(i - 1, node, 2); //mismatch
             return 1 + cv[node];
         }
         int min = 1u << 30u;
         for (int parent : graph.previousNodes[node]) {
-            min = std::min(cv[parent], min);
+            if (cv[parent] < min) {
+                min = cv[parent];
+                backtrack[i][node] = Matching(i - 1, parent, 2);//mismatch
+            }
         }
-        return 1 + std::min(min, cv[node]);
+        if (cv[node] < min) {
+            backtrack[i][node] = Matching(i - 1, node, 2); //mismatch
+            return 1 + cv[node];
+        } else {
+            return 1 + min;
+        }
     }
 }
 
-void propagate(int u, int v, NodePositionGraph &graph, std::vector<int> &cv) {
+void
+propagate(int u, int v, NodePositionGraph &graph, std::vector<int> &cv, std::vector<std::vector<Matching>> &backtrack,
+          int i) {
     if (cv[v] > 1 + cv[u]) {
         cv[v] = 1 + cv[u];
+        backtrack[i][v] = Matching(i, u, 1); // indel;
         for (int child : graph.nextNodes[v]) {
-            propagate(v, child, graph, cv);
+            propagate(v, child, graph, cv, backtrack, i);
         }
     }
 }
+
+Matching::Matching(int parentRow, int parentColumn, int op) : parentRow(parentRow), parentColumn(parentColumn),
+                                                              op(op) {}
+
+Matching::Matching() : Matching(-1, -1, -1) {}
