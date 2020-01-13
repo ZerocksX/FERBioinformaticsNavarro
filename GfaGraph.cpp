@@ -22,6 +22,17 @@ char reverseBase(char c) {
     }
 }
 
+std::string trim(const std::string& str)
+{
+    size_t first = str.find_first_not_of(' ');
+    if (std::string::npos == first)
+    {
+        return str;
+    }
+    size_t last = str.find_last_not_of(' ');
+    return str.substr(first, (last - first + 1));
+}
+
 GfaGraph *GfaGraph::loadFromFile(std::string fileName) {
     auto *gfaGraph = new GfaGraph();
     std::ifstream file{fileName};
@@ -30,7 +41,10 @@ GfaGraph *GfaGraph::loadFromFile(std::string fileName) {
     while (file.good()) {
         std::string line;
         std::getline(file, line);
-        if (!file.good()) break;
+        if(trim(line).empty()){
+            continue;
+        }
+//        if (!file.good()) break;
         if (line.empty()) continue;
         if (line[0] != 'S' && line[0] != 'L') continue;
         if (line[0] == 'S') {

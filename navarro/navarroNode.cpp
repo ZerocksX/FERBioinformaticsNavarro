@@ -7,6 +7,7 @@
 std::vector<int> score(FastQ fastQ, NodePositionGraph &graph, std::vector<std::vector<Matching>> &backtrack) {
 
     std::vector<int> cv(graph.n);
+    std::vector<int> cvTemp(graph.n);
 
     for (int i = 0; i < graph.n; ++i) {
         cv[i] = 0;
@@ -20,16 +21,18 @@ std::vector<int> score(FastQ fastQ, NodePositionGraph &graph, std::vector<std::v
 //        if (i % 100 == 0) {
 //            std::cout << "Round: " << i << " of " << m << std::endl;
 //        }
-        std::vector<int> cvTemp(graph.n);
         for (int node = 0; node < graph.n; ++node) {
             cvTemp[node] = g(node, i, c, graph, cv, backtrack);
         }
-        cv = cvTemp;
+        cv.swap(cvTemp);
         for (int node = 0; node < graph.n; ++node) {
             for (int child : graph.nextNodes[node]) {
                 propagate(node, child, graph, cv, backtrack, i);
             }
         }
+//        for (int k = 0; k < graph.n; ++k) {
+//            std::cout << graph.nodes[k] << " " << cv[k] << std::endl;
+//        }
     }
     return cv;
 }
@@ -39,11 +42,15 @@ int g(int node, int i, char c, NodePositionGraph &graph, std::vector<int> &cv,
     if (c == graph.nodes[node].getCurrentChar()) {
         int min = i - 1;
         backtrack[i][node] = Matching(-1, -1, 0);//beginning
+        int minI = -1;
         for (int parent : graph.previousNodes[node]) {
             if (cv[parent] < min) {
                 min = cv[parent];
-                backtrack[i][node] = Matching(i - 1, parent, 0);//match
+                minI = parent;
             }
+        }
+        if(minI != -1){
+            backtrack[i][node] = Matching(i - 1, minI, 0);//match
         }
         return min;
     } else {
@@ -52,12 +59,14 @@ int g(int node, int i, char c, NodePositionGraph &graph, std::vector<int> &cv,
             return 1 + cv[node];
         }
         int min = 1u << 30u;
+        int minI = -1;
         for (int parent : graph.previousNodes[node]) {
             if (cv[parent] < min) {
                 min = cv[parent];
-                backtrack[i][node] = Matching(i - 1, parent, 2);//mismatch
+                minI = parent;
             }
         }
+        backtrack[i][node] = Matching(i - 1, minI, 2);//mismatch
         if (cv[node] < min) {
             backtrack[i][node] = Matching(i - 1, node, 2); //mismatch
             return 1 + cv[node];

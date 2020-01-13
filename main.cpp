@@ -11,6 +11,7 @@
 void printBacktrack(std::vector<std::vector<Matching>> &backtrack, int i, NodePositionGraph &graph, FastQ query);
 
 int main(int argc, char **argv) {
+    std::ios::sync_with_stdio(false);
     std::string gfaPath;
     if (argc != 3) {
         std::cout << "Need to input two arguments, gfaPath and fastq path";
@@ -18,20 +19,20 @@ int main(int argc, char **argv) {
     }
     gfaPath = argv[1];
 
-    std::unique_ptr<GfaGraph> graph = std::unique_ptr<GfaGraph>(GfaGraph::loadFromFile(
+    GfaGraph* graph = GfaGraph::loadFromFile(
             gfaPath
-    ));
+    );
     std::cout << gfaPath << std::endl;
     int n = graph->vertices.size();
-    std::unordered_set<NodePosition> allPos = getAllNodes(graph.get());
-//    printGraph(allNodes, graph.get());
+    std::unordered_set<NodePosition> allPos = getAllNodes(graph);
+//    printGraph(allPos, graph.get());
 
     std::string fastqPath = argv[2];
     std::vector<FastQ> queries = loadFastqFromFile(
             fastqPath
     );
 
-    NodePositionGraph npGraph(allPos, graph.get());
+    NodePositionGraph npGraph(allPos, graph);
 //    printNPGraph(npGraph);
     auto start = std::chrono::high_resolution_clock::now();
     auto scores = std::vector<int>();
@@ -46,12 +47,20 @@ int main(int argc, char **argv) {
         int i = -1;
         int min = 1 << 30u;
         for (int k = 0; k < npGraph.n; ++k) {
+//            std::cout << npGraph.nodes[k] << " " << cv[k] << std::endl;
             if (cv[k] < min) {
                 min = cv[k];
                 i = k;
             }
         }
         int s = min;
+
+//        for (int k = 0; k < npGraph.n; ++k) {
+//            if(s==cv[k]){
+//                Matching m = backtrack[q.sequence.size()][i];
+//                printBacktrack(backtrack, k, npGraph, q);
+//            }
+//        }
         Matching m = backtrack[q.sequence.size()][i];
         printBacktrack(backtrack, i, npGraph, q);
         std::cout << s << std::endl;
@@ -59,11 +68,13 @@ int main(int argc, char **argv) {
     }
     for (int i = 0; i < scores.size(); ++i) {
         std::cout << i << ": " << scores[i] << std::endl;
-    }std::cout << std::endl;
+    }
+    std::cout << std::endl;
 
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
     std::cout << duration.count() << std::endl;
+    delete graph;
     return 0;
 }
 
@@ -73,8 +84,8 @@ void printBacktrack(std::vector<std::vector<Matching>> &backtrack, int i, NodePo
     std::vector<int> ops;
     chars.push_back(graph.nodes[i].getCurrentChar());
     ops.push_back(match.op);
-    while(true){
-        if(match.parentColumn == -1 || match.parentRow == -1){
+    while (true) {
+        if (match.parentColumn == -1 || match.parentRow == -1) {
             ops.push_back(match.op);
             break;
         }
@@ -87,11 +98,12 @@ void printBacktrack(std::vector<std::vector<Matching>> &backtrack, int i, NodePo
 //    ops.push_back(-1);
     std::reverse(ops.begin(), ops.end());
     ops.pop_back();
-    for(char c: chars){
+    for (char c: chars) {
         std::cout << c;
-    }std::cout << std::endl;
-    for(int op: ops){
-        switch (op){
+    }
+    std::cout << std::endl;
+    for (int op: ops) {
+        switch (op) {
             case -1:
                 std::cout << "B";
                 break;
@@ -105,15 +117,17 @@ void printBacktrack(std::vector<std::vector<Matching>> &backtrack, int i, NodePo
                 std::cout << "m";
                 break;
         }
-    }std::cout << std::endl;
+    }
+    std::cout << std::endl;
     int k = 0;
-    for(int op : ops){
-        if(op == 1){
+    for (int op : ops) {
+        if (op == 1) {
             std::cout << "-";
-        }else{
+        } else {
             std::cout << query.sequence[k++];
         }
-    }std::cout << std::endl;
+    }
+    std::cout << std::endl;
 }
 
 void printNPGraph(NodePositionGraph npGraph) {
