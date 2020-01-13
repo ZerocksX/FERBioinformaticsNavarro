@@ -41,7 +41,7 @@ int g(int node, int i, char c, NodePositionGraph &graph, std::vector<int> &cv,
       std::vector<std::vector<Matching>> &backtrack) {
     if (c == graph.nodes[node].getCurrentChar()) {
         int min = i - 1;
-        backtrack[i][node] = Matching(-1, -1, 0);//beginning
+//        backtrack[i][node] = Matching(-1, -1, 0);//beginning
         int minI = -1;
         for (int parent : graph.previousNodes[node]) {
             if (cv[parent] < min) {
@@ -50,12 +50,12 @@ int g(int node, int i, char c, NodePositionGraph &graph, std::vector<int> &cv,
             }
         }
         if(minI != -1){
-            backtrack[i][node] = Matching(i - 1, minI, 0);//match
+//            backtrack[i][node] = Matching(i - 1, minI, 0);//match
         }
         return min;
     } else {
         if (graph.previousNodes[node].empty()) {
-            backtrack[i][node] = Matching(i - 1, node, 2); //mismatch
+//            backtrack[i][node] = Matching(i - 1, node, 2); //mismatch
             return 1 + cv[node];
         }
         int min = 1u << 30u;
@@ -66,9 +66,9 @@ int g(int node, int i, char c, NodePositionGraph &graph, std::vector<int> &cv,
                 minI = parent;
             }
         }
-        backtrack[i][node] = Matching(i - 1, minI, 2);//mismatch
+//        backtrack[i][node] = Matching(i - 1, minI, 2);//mismatch
         if (cv[node] < min) {
-            backtrack[i][node] = Matching(i - 1, node, 2); //mismatch
+//            backtrack[i][node] = Matching(i - 1, node, 2); //mismatch
             return 1 + cv[node];
         } else {
             return 1 + min;
@@ -81,7 +81,7 @@ propagate(int u, int v, NodePositionGraph &graph, std::vector<int> &cv, std::vec
           int i) {
     if (cv[v] > 1 + cv[u]) {
         cv[v] = 1 + cv[u];
-        backtrack[i][v] = Matching(i, u, 1); // indel;
+//        backtrack[i][v] = Matching(i, u, 1); // indel;
         for (int child : graph.nextNodes[v]) {
             propagate(v, child, graph, cv, backtrack, i);
         }

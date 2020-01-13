@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
         if (k % 2 == 1) {
             q = q.reverseComplement();
         }
-        std::vector<std::vector<Matching>> backtrack(q.sequence.size() + 1, std::vector<Matching>(npGraph.n));
+        std::vector<std::vector<Matching>> backtrack(q.sequence.size());
         std::vector<int> cv = score(q, npGraph, backtrack);
         int i = -1;
         int min = 1 << 30u;
@@ -61,8 +61,8 @@ int main(int argc, char **argv) {
 //                printBacktrack(backtrack, k, npGraph, q);
 //            }
 //        }
-        Matching m = backtrack[q.sequence.size()][i];
-        printBacktrack(backtrack, i, npGraph, q);
+//        Matching m = backtrack[q.sequence.size()][i];
+//        printBacktrack(backtrack, i, npGraph, q);
         std::cout << s << std::endl;
         scores.push_back(s);
     }
