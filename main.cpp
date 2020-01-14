@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <memory>
 #include <set>
-#include <fastqloader.h>
+#include "GraphAligner/fastqloader.h"
 #include <chrono>
 #include "GfaGraph.h"
 #include "navarro/navarroNode.h"
@@ -135,11 +135,21 @@ void printNPGraph(NodePositionGraph npGraph) {
     for (int i = 0; i < npGraph.n; ++i) {
         auto nodePos = npGraph.nodes[i];
         std::cout << nodePos << std::endl;
+        char c = 0;
         for (auto &parent : npGraph.previousNodes[i]) {
+            if(c != 0 && c != npGraph.nodes[parent].getCurrentChar()){
+                std::cout << "fail" << std::endl;
+            }
+            c=npGraph.nodes[parent].getCurrentChar();
             std::cout << "\t" << npGraph.nodes[parent] << std::endl;
         }
         std::cout << "\t--------------------------------------" << std::endl;
+        c=0;
         for (auto &child : npGraph.nextNodes[i]) {
+            if(c != 0 && c != npGraph.nodes[child].getCurrentChar()){
+                std::cout << "fail" << std::endl;
+            }
+            c=npGraph.nodes[child].getCurrentChar();
             std::cout << "\t" << npGraph.nodes[child] << std::endl;
         }
     }

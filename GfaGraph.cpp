@@ -111,7 +111,7 @@ std::vector<NodePosition> NodePosition::next(GfaGraph *gfaGraph) {
         result.emplace_back(this->node, pos, this->orientation);
     }
     for (auto &it : this->node.outEdges) {
-        if ((n - it.overlap) == pos) {
+        if ((n - it.overlap) == pos && it.fromOrientation == this->orientation) {
             result.emplace_back(
                     gfaGraph->vertices[it.to],
                     0,
@@ -135,7 +135,7 @@ std::vector<NodePosition> NodePosition::previous(GfaGraph *gfaGraph) {
         result.emplace_back(this->node, pos, this->orientation);
     }
     for (auto &it : this->node.inEdges) {
-        if (it.overlap - 1 == pos) {
+        if (it.overlap - 1 == pos && it.fromOrientation == this->orientation) {
             result.emplace_back(
                     gfaGraph->vertices[it.to],
                     gfaGraph->vertices[it.to].sequence.size() - 1,
@@ -170,7 +170,7 @@ NodePosition::NodePosition(Node &node) : NodePosition(node, 0, '+') {
 
 std::ostream &operator<<(std::ostream &os, const NodePosition &position) {
     os << "node: " << position.node << " position: " << position.position
-       << " char: " << position.getCurrentChar();
+       << " char: " << position.getCurrentChar() << " orientation: " << position.orientation;
     return os;
 }
 
