@@ -2,4 +2,9 @@
 
 Navarro's algorithm implementation <br/>
 <br/>
-update <a href="https://github.com/maickrau/GraphAligner/tree/WabiExperiments">GraphAligner</a> path in main.cpp and in CMakeLists.txt
+<h3>Installation:</h3>
+cmake -S . -B build<br/>
+cd build<br/>
+make<br/>
+<h3>Running:</h3>
+build/navarro {path to .gfa} {path to .fastq}
