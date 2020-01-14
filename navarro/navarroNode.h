@@ -5,7 +5,7 @@
 #ifndef NAVARRO_NAVARRONODE_H
 #define NAVARRO_NAVARRONODE_H
 
-#include <fastqloader.h>
+#include "../GraphAligner/fastqloader.h"
 #include <unordered_map>
 #include <unordered_set>
 #include "../GfaGraph.h"
